@@ -1,0 +1,141 @@
+<style>
+    canvas {
+        border: 1px solid #000;
+        background: #ffc;
+    }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+        integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <canvas id="quadro" width="600" height="600"></canvas>
+    <script>
+        $(document).ready(function () {
+            var canvas = $("#quadro")[0];
+            var ctx = canvas.getContext("2d");
+            var snake = [];
+            var velocidade = 20;
+            var frame;
+            var comida = {
+                x: 20 + Math.floor(Math.random() * canvas.width) - 20,
+                y: 20 + Math.floor(Math.random() * canvas.height) - 20,
+                cor: "green",
+                desenha: function () {
+                    ctx.fillStyle = this.cor;
+                    ctx.fillRect(this.x, this.y, 20, 20);
+                }
+            }
+            function colisao(q1, q2) {
+                var t1 = q1.y;
+                var t2 = q2.y;
+                var e1 = q1.x;
+                var e2 = q2.x;
+                var b1 = q1.y + 20;
+                var b2 = q2.y + 20;
+                var d1 = q1.x + 20;
+                var d2 = q2.x + 20;
+                if (b1 > t2 && t1 < b2 && d2 > e1 && e2 < d1) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            function retornaQuadrado(x, y) {
+                return {
+                    x: x,
+                    y: y,
+                    vx: velocidade,
+                    vy: 0,
+                    cor: "red",
+                    atualiza: function () {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                    },
+                    desenha: function () {
+                        ctx.fillStyle = this.cor;
+                        ctx.fillRect(this.x, this.y, 20, 20);
+                    }
+                }
+            }
+            function limpar() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            snake.push(retornaQuadrado(10, 10));
+            var intervaloAtual = 0;
+            var intervalo = 100;
+            function animacao(tempoAtual) {
+                if (tempoAtual - intervaloAtual > intervalo) {
+                    intervaloAtual = tempoAtual;
+                    //limpar tela
+                    limpar();
+                    comida.desenha();
+                    //desenhar snake
+                    for (var i = 0; i < snake.length; i++) {
+                        snake[i].desenha();
+                    }
+                    //atualizar snake
+                    for (var i = snake.length - 1; i > 0; i--) {
+                        snake[i].x = snake[i - 1].x;
+                        snake[i].y = snake[i - 1].y;
+                    }
+                    snake[0].atualiza();
+                    //detectar colisao
+                    if (snake[0].x <= 0 || snake[0].x + 20 >= canvas.width || snake[0].y <= 0 || snake[0].y + 20 >= canvas.height) {
+                        //cancelar game
+                        cancelAnimationFrame(frame);
+                        return;
+                    }
+                    if (colisao(snake[0], comida) == true) {
+                        comida.x = Math.floor(Math.random() * canvas.width) - 20;
+                        comida.y = Math.floor(Math.random() * canvas.height) - 20;
+                        snake.push(retornaQuadrado(snake[snake.length - 1].x, snake[snake.length - 1].y));
+                    }
+                    //animacao
+                }
+                frame = requestAnimationFrame(animacao);
+            }
+            animacao();
+            $(document).keydown(function (event) {
+                //esquerda
+                if (event.which == 37) {
+                    if (snake[0].vx == 0) {
+                        snake[0].vx = -velocidade;
+                    }
+                    snake[0].vy = 0;
+                }
+                //direita
+                if (event.which == 39) {
+                    if (snake[0].vx == 0) {
+                        snake[0].vx = velocidade;
+                    }
+                    snake[0].vy = 0;
+                }
+                //cima
+                if (event.which == 38) {
+                    snake[0].vx = 0;
+                    if (snake[0].vy == 0) {
+                        snake[0].vy = -velocidade;
+                    }
+                }
+                //baixo
+                if (event.which == 40) {
+                    snake[0].vx = 0;
+                    if (snake[0].vy == 0) {
+                        snake[0].vy = velocidade;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
