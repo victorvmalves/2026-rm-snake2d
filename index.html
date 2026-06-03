@@ -25,8 +25,8 @@
             var velocidade = 20;
             var frame;
             var comida = {
-                x: 20 + Math.floor(Math.random() * canvas.width) - 20,
-                y: 20 + Math.floor(Math.random() * canvas.height) - 20,
+                x: Math.floor(Math.random()* (canvas.width - 20)),
+                y: Math.floor(Math.random()* (canvas.height - 20)),
                 cor: "green",
                 desenha: function () {
                     ctx.fillStyle = this.cor;
@@ -72,7 +72,10 @@
             snake.push(retornaQuadrado(10, 10));
             var intervaloAtual = 0;
             var intervalo = 100;
+            var img = new Image();
+            img.src="./sprite1.webp";
             function animacao(tempoAtual) {
+                ctx.drawImage(img,0,0,75,86,0,0,75,86);
                 if (tempoAtual - intervaloAtual > intervalo) {
                     intervaloAtual = tempoAtual;
                     //limpar tela
